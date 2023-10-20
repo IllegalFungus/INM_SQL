@@ -205,6 +205,8 @@ UPDATE PIZZA_TOPPINGS SET PRICE = 9.37 WHERE PIZZA_NR = '18';
 UPDATE CUSTOMER SET PHONE='0672356723' WHERE CUST_ID='0006205484089';
 UPDATE CUSTOMER SET SURNAME='MBUYAZI'  WHERE CUST_ID='9504058405089';
 
+/*-------Update Order-------*/
+UPDATE [Order] SET ORDER_STATUS = 'Shipped' WHERE ORDER_ID = 'ORD001';
 /*-------End of Update Queries-------*/
 
 /*-------Delete Queries-------*/
@@ -232,6 +234,8 @@ DELETE FROM PIZZA_TOPPINGS WHERE PIZZA_NR='2';
 DELETE FROM CUSTOMER WHERE CUST_ID='7301120112089';
 DELETE FROM CUSTOMER WHERE CUST_ID='8805037503081';
 
+/*-------Delete Order-------*/
+DELETE FROM [Order] WHERE ORDER_ID = 'ORD003';
 /*-------End of Delete Update Pizza-------*/
 
 /*-------Insert Queries-------*/
@@ -353,4 +357,10 @@ WHERE GENDER = 'MALE';
 CREATE VIEW FEMALE_CUSTOMERS AS
 SELECT * FROM CUSTOMER
 WHERE GENDER = 'FEMALE';
+
+/*-------Views Order-------*/
+CREATE VIEW PendingOrders AS
+SELECT *
+FROM [Order]
+WHERE ORDER_STATUS = 'Pending';
 /*-------End of Creating Views-------*/
