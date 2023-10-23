@@ -1,0 +1,394 @@
+CREATE TABLE BASE (
+    BASE_CODE VARCHAR(50) PRIMARY KEY UNIQUE NOT NULL,
+    PIZZA_SIZE INT NOT NULL,
+    BASE_TYPE VARCHAR(50) NOT NULL,
+    BASE_SHAPE VARCHAR(50) NOT NULL,
+    BASE_THICKNESS VARCHAR(50) NOT NULL,
+    CRUST_TYPE VARCHAR(50) NOT NULL,
+    PRICE DOUBLE NOT NULL,
+    AVAILABILITY BOOLEAN NOT NULL
+);
+
+
+CREATE TABLE CUSTOMER (
+    CUST_ID VARCHAR(50) PRIMARY KEY NOT NULL UNIQUE,
+    TITLE VARCHAR(50) NOT NULL,
+    NAME VARCHAR(50) NOT NULL,
+    SURNAME VARCHAR(50) NOT NULL,
+    GENDER VARCHAR(50) NOT NULL,
+    PHONE VARCHAR(13) NOT NULL,
+    ADDRESS VARCHAR(50) NOT NULL,
+    POSTAL_CODE VARCHAR(50) NOT NULL
+);
+
+
+CREATE TABLE [Order] (
+    ORDER_ID VARCHAR(50) PRIMARY KEY UNIQUE NOT NULL,
+    ORDER_DATE VARCHAR(50) NOT NULL,
+    ORDER_STATUS VARCHAR(50) NOT NULL,
+    DELIVERY_ADDRESS VARCHAR(50),
+    DELIVERY_STATUS VARCHAR(50),
+    ORDERTYPE VARCHAR(50) NOT NULL,
+    PAYMENT_TYPE VARCHAR(50) NOT NULL,
+    CUST_ID VARCHAR(50),
+    FOREIGN KEY (CUST_ID) REFERENCES CUSTOMER (CUST_ID) ON DELETE CASCADE
+);
+
+
+CREATE TABLE PIZZA (
+    PIZZA_NR INT PRIMARY KEY UNIQUE NOT NULL,
+    PIZZA_NAME STRING NOT NULL,
+    BASE_CODE VARCHAR(50) NOT NULL,
+    PIZZA_TYPE STRING NOT NULL,
+    PRICE DOUBLE NOT NULL,
+    ORDER_ID VARCHAR(50) NOT NULL,
+    QUANTITY INT NOT NULL,
+    SPECIAL_INSTRUCTIONS VARCHAR(255),
+    FOREIGN KEY (BASE_CODE) REFERENCES BASE (BASE_CODE) ON DELETE CASCADE ,
+    FOREIGN KEY (ORDER_ID) REFERENCES [ORDER] (ORDER_ID) ON DELETE CASCADE
+);
+
+CREATE TABLE TOPPING (
+    TOP_CODE VARCHAR(50) PRIMARY KEY NOT NULL UNIQUE,
+    NAME VARCHAR(50) NOT NULL,
+    DESCRIPTION STRING NOT NULL,
+    CATEGORY STRING NOT NULL,
+    IS_VEGITARIAN BOOLEAN NOT NULL,
+    STOCK_QUANTITY INT NOT NULL,
+    EXPIRY_DATE VARCHAR(50) NOT NULL,
+    PRICE DOUBLE NOT NULL
+);
+
+CREATE TABLE PIZZA_TOPPINGS (
+    TOP_CODE VARCHAR(50),
+    PIZZA_NR INT,
+    QUANTITY INT NOT NULL,
+    PRICE DOUBLE NOT NULL,
+    IS_VEGITARIAN BOOLEAN NOT NULL,
+    SPICE_LEVEL VARCHAR(20),
+    EXTRA_TOPPING BOOLEAN,
+    NOTES TEXT,
+    PRIMARY KEY (TOP_CODE, PIZZA_NR),
+    FOREIGN KEY (TOP_CODE)REFERENCES TOPPING (TOP_CODE)ON DELETE CASCADE,
+    FOREIGN KEY (PIZZA_NR) REFERENCES PIZZA (PIZZA_NR) ON DELETE CASCADE
+);
+
+CREATE TABLE AUDIT_TOPPING (
+    AUTH_ID VARCHAR(50) PRIMARY KEY UNIQUE NOT NULL,
+    CUST_ID VARCHAR(50) REFERENCES CUSTOMER (CUST_ID) ON DELETE CASCADE,
+    DATE_CHANGED VARCHAR(50) NOT NULL,
+    TOP_CODE VARCHAR(50) REFERENCES TOPPING (TOP_CODE) ON DELETE CASCADE,
+    OLD_PRICE DOUBLE NOT NULL,
+    NEW_PRICE DOUBLE NOT NULL,
+    REASON_FOR_CHANGE VARCHAR(255),
+    EMPLOYEE_NAME VARCHAR(100),
+    AUDIT_NOTES TEXT
+    
+);
+
+/*-------Base-------*/
+INSERT INTO BASE (BASE_CODE, PIZZA_SIZE, BASE_TYPE, BASE_SHAPE, BASE_THICKNESS, CRUST_TYPE, PRICE, AVAILABILITY)
+VALUES
+('B20','SMALL','SILICILIAN','CIRCULAR','THIN','CRACKER CRUST',20,true),
+('B21','LARGE','DETROIT','RECTANGULAR','THICK','STUFFED CRUST',45,true),
+('B22','MEDIUM','WHOLEWHEAT','CIRCULAR','THIN','CHEESE CRUST',35,true),
+('B23','LARGE','VEGAN','CIRCULAR','THIN','FLAT BREAD',40,true),
+('B24','MEDIUM','NEW YORK','CIRCULAR','THICK','CHEESE CRUST',30,true),
+('B25','SMALL','CHICAGO','CIRCULAR','THICK','STUFFED CRUST',30,true),
+('B26','SMALL','WHOLEWHEAT','RECTANGULAR','THIN ','FLAT BREAD',20,false),
+('B27','LARGE','DETROIT','RECTANGULAR','THIN','CRACKER CRUST',45,false),
+('B28','MEDIUM','NEOPOLITAN','CIRCULAR','THICK','STUFFED CRUST',30,true),
+('B29','MEDIUM','BROOKLYN','RECTANGULAR','THICK','STUFFED CRUST',36,true);
+
+/*-------Topping-------*/
+INSERT INTO TOPPING
+VALUES
+('ASP', 'Asparagus', 'Bright green vegetable that is tender and sweet when it is cooked', 'Vegetable', TRUE, 100, '01/01/2025', 10.00),     
+('HAM', 'Ham', 'Cut of meat consisting of the thigh of a pig', 'Meat', FALSE, 230, '10/11/2023', 15.00),
+('PIN', 'Pineapple', 'A strong sweet yellow fruit', 'Fruit', TRUE, 30, '01/11/2023', 8.00),
+('CHK', 'Chicken', 'White meat belonging to a chicken', 'Meat', FALSE, 100, '31/12/2023', 10.00),
+('MOZ', 'Mozzarella', 'A soft white cheese', 'Cheese', TRUE, 10, '01/01/2024', 11.00),
+('AVO', 'Avocado', 'A smooth textured greed fruit with a pit in the center', 'Fruit', TRUE, 34, '15/11/2023', 20.00),
+('BEF', 'Beef', 'Red meat belonging to a cow', 'Meat', FALSE, 70, '31/12/2023', 17.00),
+('RCK', 'Rocket', 'A herb with a pungent peppery flavour', 'Herb', TRUE, 6, '30/11/2023', 7.00),
+('ONI', 'Onion', 'A layered root vegetable with strong flavour and odour', 'Vegetable', TRUE, 41, '31/12/2023', 9.00),
+('CHE', 'Cheddar', 'A ripened hard yellow or white cheese', 'Cheese', TRUE, 78, '01/01/2024', 7.50);
+
+/*-------Customers-------*/
+INSERT INTO CUSTOMER
+VALUES
+('0006205484089','MR','MPUMZI','MBULA','MALE','0658436358','106 GASELA STREET GUGULETHU ','7750'),
+('0005038803081','MR','MATHEW','SHAW','MALE','0718227474','3 JOHN DRIVE CONSTANTIA','8043'),
+('9003159005081','MS','JANE','VAN DE MEEWE','FEMALE','0768825634','12 BIKO DRIVE MILNETON','7901'),
+('8507228502089','MRS','NYAMEKA','OJUGO','FEMALE','0653768465','863 JAN SMART BRACKENFELL','8904'),
+('9708199708089','MS','SHAEEDA','JACOB','FEMALE','0609007777','8 MANDELA DRIVE CAMPSBAY ','9890'),
+('0308127650722','MR','DERICK','VAN VEIK','MALE','0823219088','9 BEACH DRIVE CLIFTON','9892'),
+('9504058405089','MR','MBASA','CABANE','MALE','0783762229','5567A KHAYELITSHA','7734'),
+('7301120112089','MR','TYRESE','MALEKE','MALE','0711144523','56 HAIL STREET CAPE TOWN ','8000'),
+('9912078012081','MS','STACY','JOHNSON','FEMALE','0843478893','67 GRANGER ROAD WATERFRONT ','8006'),
+('8805037503081','MS','LISA','WRATH','FEMALE','0659898232','87 LONG DRIVE DURBANVILLE','5324');
+
+/*-------Order-------*/
+INSERT INTO [Order] 
+VALUES 
+('ORD001', '2023-10-19', 'Pending', '123 Main St', 'Not Shipped', 'Online', 'Credit Card', '0006205484089'),
+('ORD002', '2023-10-20', 'Shipped', '456 Elm St', 'In Transit', 'In-Store', 'Cash', '0005038803081'),
+('ORD003', '2023-10-21', 'Delivered', '789 Oak St', 'Delivered', 'Online', 'Credit Card', '9003159005081'),
+('ORD004', '2023-10-22', 'Pending', '101 Pine St', 'Not Shipped', 'In-Store', 'Cash', '8507228502089'),
+('ORD005', '2023-10-23', 'Shipped', '202 Cedar St', 'In Transit', 'Online', 'Credit Card', '9708199708089'),
+('ORD006', '2023-10-24', 'Pending', '303 Willow St', 'Not Shipped', 'In-Store', 'Cash', '0308127650722'),
+('ORD007', '2023-10-25', 'Shipped', '404 Birch St', 'In Transit', 'Online', 'Credit Card', '9504058405089'),
+('ORD008', '2023-10-26', 'Delivered', '505 Maple St', 'Delivered', 'In-Store', 'Cash', '7301120112089'),
+('ORD009', '2023-10-27', 'Pending', '606 Pine St', 'Not Shipped', 'Online', 'Credit Card', '9912078012081'),
+('ORD0010', '2023-10-28', 'Shipped', '707 Oak St', 'In Transit', 'In-Store', 'Cash', '8805037503081');
+
+/*-------Audit Topping-------*/
+INSERT INTO AUDIT_TOPPING
+VALUES
+('AUTH01', '0006205484089', '2022-03-31', 'HAM', 15.00, 16.00,'Seasonal price adjustment', 'JOHN STEERNBURG', 'Increased due to high demand during holidays.'),
+('AUTH02', '0005038803081', '2022-04-30', 'PIN', 8.00, 7.00,'Clearance sale', 'NOMBULELO MBULA', 'Reduced price to clear out excess inventory.'),
+('AUTH03', '9003159005081', '2022-05-31', 'ASP', 10.00, 11.00,'Regular price adjustment', 'KEVIN HART', 'Updated pricing strategy for profitability.'),
+('AUTH04', '8507228502089', '2022-05-31', 'CHK', 12.00, 11.00,'Flash sale', 'OYADEJI AFOLAYAN', 'Limited-time discount to boost sales.'),
+('AUTH05', '9708199708089', '2022-05-31', 'MOZ', 15.00, 12.00,'Seasonal special', 'PRINCESS SMITH', 'Increased for a limited time during holiday season.'),
+('AUTH06', '0308127650722', '2022-05-31', 'AVO', 22.00, 22.00,'No change', 'OYADEJI AFOLAYAN', 'Price remains the same for this topping.'),
+('AUTH07', '9504058405089', '2022-05-31', 'BEF', 17.00, 20.00,'Quality improvement', 'LONA CAMBRIDGE', 'Upgraded topping quality justifies a price increase.'),
+('AUTH08', '7301120112089', '2022-05-31', 'RCK', 7.00, 9.00,'Quality improvement', 'KEVIN HART', 'Upgraded topping quality justifies a price increase.'),
+('AUTH09', '9912078012081', '2022-05-31', 'ONI', 9.00, 10.00,'Seasonal price adjustment', 'LONA CAMBRIDE', 'Increased due to high demand during holidays.'),
+('AUTH10', '8805037503081', '2022-05-31', 'CHE', 7.50, 9.00,'Seasonal price adjustment', 'LONA CAMBRIDGE', 'Increased due to high demand during holidays.');
+
+INSERT INTO PIZZA 
+VALUES
+(  2, 'Asparagus Pizza', 'B21', 'Asaparagus', 10.00 , 'ORD001' , 4,'Write Happy birthday andrew on the box'),     
+(  4, 'Pizza Prosciutto', 'B22', 'Ham', 15.00, 'ORD002' , 2 ,'Cut Pizza Into Concentric Circles'),
+(  6, 'hawaiian Pizza', 'B23','Hawaiian', 8.00, 'ORD003'  ,7 ,'Draw A Cat On The Box'),
+(  8, 'Chicken Pizza', 'B24', 'Chicken', 10.00, 'ORD004'  ,5 , 'Cut Into A Pentagram'),
+( 10, 'Italian Cheese Pizza', 'B25', 'Cheese', 11.00, 'ORD005' , 4,'Draw A Narwhal On The Box'),
+( 12, 'Avocado Pizza', 'B26', 'Acocado', 20.00, 'ORD006' , 3,'PLZ REMEMBER THE CINNA - SAUCE'),
+( 14, 'Beef Pizza', 'B27', 'Beef', 17.00, 'ORD007'  , 6 ,''),
+( 16, 'Rocket Pizza', 'B28', 'Herb', 7.00, 'ORD008'  , 2,'write a joke on the box'),
+( 18, 'Onion pizza', 'B28', 'Onion', 9.00, 'ORD009' ,1 ,''),
+( 20, 'Cheddar Cheese Pizza', 'B21', 'Cheese', 7.50, 'ORD0010' ,6 ,'Dont forget drinks');
+
+INSERT INTO PIZZA_TOPPINGS
+VALUES
+('ASP', 2, 4, 10.00, true,'Normal',true,'No notes'),
+('HAM', 4, 2, 15.00, false,'Normal',true,'No Notes'),
+('PIN', 6, 7, 8.00, true,'Normal',false,'No notes'),
+('CHK', 8, 5, 10.00, false,'Medium',false,'Spread on one half of the pizza'),
+('MOZ', 10, 4, 11.00, true,'Normal',false,'Spread on the box next to the pizza'),
+('AVO', 12, 3, 20.00, true,'Medium',true,'No notes'),
+('BEF', 14, 6, 17.00, false,'Extra-Hot',true,'No Notes'),
+('RCK', 16, 2, 7.00, true,'Extra-hot',false,'No Notes'),
+('ONI', 18, 1, 9.00, true,'Mild',false,'No Notes'),
+('CHE', 20, 6, 7.50, true,'Mild',true,'No Notes');
+/*-------End of Populating DB-------*/
+
+/*-------Update Queries-------*/
+/*-------Update Pizza-------*/
+UPDATE PIZZA SET QUANTITY = 1 WHERE PIZZA_NAME = 'Beef Pizza';
+UPDATE PIZZA SET PRICE = 9.37 WHERE PIZZA_NR = 18;
+
+/*-------Update Topping-------*/
+UPDATE TOPPING SET STOCK_QUANTITY = 0 WHERE TOP_CODE = 'AVO';
+UPDATE TOPPING SET PRICE = 9.37 WHERE TOP_CODE = 'ONI';
+
+/*-------Update Base-------*/
+UPDATE BASE SET AVAILABILITY = 1 WHERE BASE_CODE = 'B26';
+UPDATE BASE SET BASE_THICKNESS = 'THIN' WHERE BASE_CODE = 'B24';
+
+/*-------Update Audit Topping-------*/
+UPDATE AUDIT_TOPPING SET OLD_PRICE = 11.00, NEW_PRICE = 12.00 WHERE AUTH_ID = 'AUTH01';
+UPDATE AUDIT_TOPPING SET OLD_PRICE = 10.00, NEW_PRICE = 17.00 WHERE AUTH_ID = 'AUTH09';
+
+/*-------Update Pizza Toppings-------*/
+UPDATE PIZZA_TOPPINGS SET QUANTITY = 1 WHERE PIZZA_NR = 14;
+UPDATE PIZZA_TOPPINGS SET PRICE = 9.37 WHERE PIZZA_NR = 18;
+
+/*-------Update Customer-------*/
+UPDATE CUSTOMER SET PHONE='0672356723' WHERE CUST_ID='0006205484089';
+UPDATE CUSTOMER SET SURNAME='MBUYAZI'  WHERE CUST_ID='9504058405089';
+
+/*-------Update Order-------*/
+UPDATE [Order] SET ORDER_STATUS = 'Shipped' WHERE ORDER_ID = 'ORD001';
+UPDATE [Order] SET ORDER_STATUS = 'Shipped' WHERE ORDER_ID = 'ORD009';
+
+/*-------End of Update Queries-------*/
+
+
+/*-------Delete Customer-------*/
+DELETE FROM CUSTOMER WHERE CUST_ID='7301120112089';
+DELETE FROM CUSTOMER WHERE CUST_ID='8805037503081';
+
+/*-------Delete Order-------*/
+DELETE FROM [Order] WHERE ORDER_ID = 'ORD002';
+DELETE FROM [Order] WHERE ORDER_ID = 'ORD004';
+
+/*-------Delete Topping*/
+DELETE FROM TOPPING WHERE TOP_CODE = 'PIN';
+DELETE FROM TOPPING WHERE TOP_CODE='BEF';
+
+DELETE FROM PIZZA_TOPPINGS WHERE PIZZA_NR =10;
+DELETE FROM PIZZA_TOPPINGS WHERE PIZZA_NR=12;
+
+/*-------Delete Audit Topping-------*/
+DELETE FROM AUDIT_TOPPING WHERE AUTH_ID = 'AUTH03';
+DELETE FROM AUDIT_TOPPING WHERE AUTH_ID = 'AUTH05';
+
+/*-------Delete Base-------*/
+DELETE FROM BASE WHERE BASE_CODE = 'B20';
+DELETE FROM BASE WHERE BASE_CODE = 'B29';
+
+DELETE FROM PIZZA WHERE PIZZA_NR =18;
+DELETE FROM PIZZA WHERE PIZZA_NR=2;
+
+INSERT INTO BASE (BASE_CODE, PIZZA_SIZE, BASE_TYPE, BASE_SHAPE, BASE_THICKNESS, CRUST_TYPE, PRICE, AVAILABILITY)
+VALUES
+('B20','SMALL','SILICILIAN','CIRCULAR','THIN','CRACKER CRUST',20,true),
+('B29','MEDIUM','BROOKLYN','RECTANGULAR','THICK','STUFFED CRUST',36,true);
+
+INSERT INTO CUSTOMER
+VALUES
+('7301120112089','MR','TYRESE','MALEKE','MALE','0711144523','56 HAIL STREET CAPE TOWN ','8000'),
+('8805037503081','MS','LISA','WRATH','FEMALE','0659898232','87 LONG DRIVE DURBANVILLE','5324');
+
+INSERT INTO TOPPING VALUES
+('PIN', 'Pineapple', 'A strong sweet yellow fruit', 'Fruit', TRUE, 30, '01/11/2023', 8.00),
+('BEF', 'Beef', 'Red meat belonging to a cow', 'Meat', FALSE, 70, '31/12/2023', 17.00);
+
+INSERT INTO [ORDER] VALUES
+('ORD008', '2023-10-26', 'Delivered', '505 Maple St', 'Delivered', 'In-Store', 'Cash', '7301120112089'),
+('ORD0010', '2023-10-28', 'Shipped', '707 Oak St', 'In Transit', 'In-Store', 'Cash', '8805037503081'),
+('ORD002', '2023-10-20', 'Shipped', '456 Elm St', 'In Transit', 'In-Store', 'Cash', '0005038803081'),
+('ORD004', '2023-10-22', 'Pending', '101 Pine St', 'Not Shipped', 'In-Store', 'Cash', '8507228502089');
+
+INSERT INTO PIZZA VALUES
+( 16, 'Rocket Pizza', 'B28', 'Herb', 7.00, 'ORD008'  , 2,'write a joke on the box'),
+( 20, 'Cheddar Cheese Pizza', 'B21', 'Cheese', 7.50, 'ORD0010' ,6 ,'Dont forget drinks'),
+(  4, 'Pizza Prosciutto', 'B23', 'Ham', 15.00, 'ORD002' , 2 ,'Cut Pizza Into Concentric Circles'),
+(  8, 'Chicken Pizza', 'B24', 'Chicken', 10.00, 'ORD004'  ,5 , 'Cut Into A Pentagram'),
+(  2, 'Asparagus Pizza', 'B21', 'Asaparagus', 10.00 , 'ORD001' , 4,'Write Happy birthday andrew on the box'),
+( 18, 'Onion pizza', 'B29', 'Onion', 9.00, 'ORD009' ,1 ,'');
+     
+INSERT INTO PIZZA_TOPPINGS VALUES
+('RCK', 16, 2, 7.00, true,'Extra-hot',false,'No Notes'),
+('CHE', 20, 6, 7.50, true,'Mild',true,'No Notes'),
+('HAM', 4, 2, 15.00, false,'Normal',true,'No Notes'),
+('CHK', 8, 5, 10.00, false,'Medium',false,'Spread on one half of the pizza'),
+('PIN', 6, 7, 8.00, true,'Normal',false,'No notes'),
+('BEF', 14, 6, 17.00, false,'Extra-Hot',true,'No Notes'),
+('MOZ', 10, 4, 11.00, true,'Normal',false,'Spread on the box next to the pizza'),
+('AVO', 12, 3, 20.00, true,'Medium',true,'No notes'),
+('ASP', 2, 4, 10.00, true,'Normal',true,'No notes'),
+('ONI', 18, 1, 9.00, true,'Mild',false,'No Notes')
+;
+
+INSERT INTO AUDIT_TOPPING VALUES
+('AUTH08', '7301120112089', '2022-05-31', 'RCK', 7.00, 9.00,'Quality improvement', 'KEVIN HART', 'Upgraded topping quality justifies a price increase.'),
+('AUTH10', '8805037503081', '2022-05-31', 'CHE', 7.50, 9.00,'Seasonal price adjustment', 'LONA CAMBRIDGE', 'Increased due to high demand during holidays.'),
+('AUTH02', '0005038803081', '2022-04-30', 'PIN', 8.00, 7.00,'Clearance sale', 'NOMBULELO MBULA', 'Reduced price to clear out excess inventory.'),
+('AUTH07', '9504058405089', '2022-05-31', 'BEF', 17.00, 20.00,'Quality improvement', 'LONA CAMBRIDGE', 'Upgraded topping quality justifies a price increase.'),
+('AUTH03', '9003159005081', '2022-05-31', 'ASP', 10.00, 11.00,'Regular price adjustment', 'KEVIN HART', 'Updated pricing strategy for profitability.'),
+('AUTH05', '9708199708089', '2022-05-31', 'MOZ', 15.00, 12.00,'Seasonal special', 'PRINCESS SMITH', 'Increased for a limited time during holiday season.');
+
+CREATE VIEW CustomerOrders AS SELECT 
+   c.CUST_ID, c.NAME, c.SURNAME, c.PHONE, c.ADDRESS, c.POSTAL_CODE,
+   o.ORDER_ID, o.ORDER_DATE, o.ORDER_STATUS, o.DELIVERY_ADDRESS, o.DELIVERY_STATUS, o.ORDERTYPE, o.PAYMENT_TYPE
+FROM CUSTOMER c
+JOIN [Order] o ON c.CUST_ID = o.CUST_ID;
+
+CREATE VIEW PIZZA_TYPE AS
+SELECT PIZZA_NR, PIZZA_NAME, PIZZA_TYPE
+FROM PIZZA 
+WHERE PIZZA_TYPE <= 17.00;
+
+CREATE VIEW PIZZA_17LESS AS
+SELECT PIZZA_NR, PIZZA_NAME, PRICE
+FROM PIZZA
+WHERE PRICE <= 17.00;
+
+/*-------Views Base-------*/
+CREATE VIEW LARGE_SIZE_BASES AS 
+SELECT * 
+FROM BASE 
+WHERE PIZZA_SIZE = 'LARGE';
+
+CREATE VIEW AVAILABLE_BASES AS
+SELECT * 
+FROM BASE 
+WHERE AVAILABILITY = '1';
+
+CREATE VIEW THICK_CRUST_BASES AS
+SELECT * 
+FROM BASE 
+WHERE BASE_THICKNESS = 'THICK';
+
+CREATE VIEW CustomizedBaseInfo AS
+SELECT BASE_CODE, PIZZA_SIZE, BASE_TYPE, BASE_SHAPE, BASE_THICKNESS
+FROM BASE;
+
+/*-------Views Toppings-------*/
+CREATE VIEW TOPPING_VEGATARIAN AS
+SELECT TOP_CODE, NAME, IS_VEGITARIAN
+FROM TOPPING
+WHERE IS_VEGITARIAN = TRUE;
+
+CREATE VIEW TOPPING_15LESS AS
+SELECT TOP_CODE, NAME, PRICE
+FROM TOPPING
+WHERE PRICE <= 15.00;
+
+CREATE VIEW TOPPING_NOSTOCK AS
+SELECT TOP_CODE, NAME, STOCK_QUANTITY
+FROM TOPPING
+WHERE STOCK_QUANTITY = 0;
+
+/*-------Views Audit Topping-------*/
+CREATE VIEW UpdatedPrices AS
+SELECT AUTH_ID, TOP_CODE, OLD_PRICE, NEW_PRICE
+FROM AUDIT_TOPPING
+WHERE OLD_PRICE <> NEW_PRICE;
+
+/*-------Views Pizza Toppings-------*/
+CREATE VIEW LOWSTOCK AS
+SELECT TOP_CODE, PIZZA_NR, QUANTITY
+FROM PIZZA_TOPPINGS
+WHERE QUANTITY <= 3;
+
+CREATE VIEW NOT_VEGITARIAN AS
+SELECT TOP_CODE, PIZZA_NR, IS_VEGITARIAN
+FROM PIZZA_TOPPINGS
+WHERE IS_VEGITARIAN = FALSE;
+
+/*-------Views Customer-------*/
+CREATE VIEW CUSTOMERS_IN_AREA AS
+SELECT * FROM CUSTOMER
+WHERE ADDRESS LIKE '%CAPE TOWN%';
+
+CREATE VIEW CUSTOMER_DETAILS AS
+SELECT CUST_ID, TITLE, NAME, SURNAME, GENDER, PHONE, ADDRESS, POSTAL_CODE
+FROM CUSTOMER;
+
+CREATE VIEW MALE_CUSTOMERS AS
+SELECT * FROM CUSTOMER
+WHERE GENDER = 'MALE';
+
+CREATE VIEW FEMALE_CUSTOMERS AS
+SELECT * FROM CUSTOMER
+WHERE GENDER = 'FEMALE';
+
+/*-------Views Order-------*/
+CREATE VIEW PendingOrders AS
+SELECT *
+FROM [Order]
+WHERE ORDER_STATUS = 'Pending';
+/*-------End of Creating Views-------*/
+
+
+
+
+
+
+
+
+
+
